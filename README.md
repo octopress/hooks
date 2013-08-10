@@ -1,4 +1,4 @@
-# Jekyll::Pagehooks
+# Jekyll Page Hooks
 
 This plugin isn't useful on its own. It monkeypatches Jekyll's Site, Post, Page and Convertible classes to allow plugin authors to access page and post data before and after render, and after write. 
 
