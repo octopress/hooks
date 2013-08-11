@@ -28,14 +28,14 @@ module Jekyll
   # see: https://github.com/mojombo/jekyll/blob/master/lib/jekyll/site.rb
   class Site
 
-    # Instance variable to store the various post_filter
+    # Instance variable to store the various page_hook
     # plugins that are loaded.
-    attr_accessor :post_filters
+    attr_accessor :page_hooks
 
-    # Instantiates all of the post_filter plugins. This is basically
+    # Instantiates all of the page_hook plugins. This is basically
     # a duplication of the other loaders in Site#setup.
-    def load_post_filters
-      self.post_filters = Jekyll::PageHooks.subclasses.select do |c|
+    def load_page_hooks
+      self.page_hooks = Jekyll::PageHooks.subclasses.select do |c|
         !self.safe || c.safe
       end.map do |c|
         c.new(self.config)
@@ -98,38 +98,38 @@ module Jekyll
     end
 
     # Call the #pre_render methods on all of the loaded
-    # post_filter plugins.
+    # page_hook plugins.
     #
     # Returns nothing
     def pre_render
-      self.site.load_post_filters unless self.site.post_filters
+      self.site.load_page_hooks unless self.site.page_hooks
 
-      if self.site.post_filters and is_filterable?
-        self.site.post_filters.each do |filter|
+      if self.site.page_hooks and is_filterable?
+        self.site.page_hooks.each do |filter|
           filter.pre_render(self)
         end
       end
     end
 
     # Call the #post_render methods on all of the loaded
-    # post_filter plugins.
+    # page_hook plugins.
     #
     # Returns nothing
     def post_render
-      if self.site.post_filters and is_filterable?
-        self.site.post_filters.each do |filter|
+      if self.site.page_hooks and is_filterable?
+        self.site.page_hooks.each do |filter|
           filter.post_render(self)
         end
       end
     end
 
     # Call the #post_write methods on all of the loaded
-    # post_filter plugins.
+    # page_hook plugins.
     #
     # Returns nothing
     def post_write
-      if self.site.post_filters and is_filterable?
-        self.site.post_filters.each do |filter|
+      if self.site.page_hooks and is_filterable?
+        self.site.page_hooks.each do |filter|
           filter.post_write(self)
         end
       end
