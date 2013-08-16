@@ -35,8 +35,8 @@ module Jekyll
     # Replaces <strong> tag with <strong><blink> after html has been rendered.
     #
     def blink_strong(content)
-      content.gsub /<strong>(.+?)<\/strong>/ do
-        "<strong><blink>#{$1}</blink></strong>"
+      content.gsub /(<strong>.+?<\/strong>)/ do
+        "<blink>#{$1}</blink>"
       end
     end
 
