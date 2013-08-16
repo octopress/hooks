@@ -51,6 +51,8 @@ module Jekyll
 end
 ```
 
+For a more complete example, check out [test.rb](test/_plugins/test.rb) and [index.md](test/index.md).
+
 ### When to use what
 
 With `pre_render` you can access page and post data before it has been

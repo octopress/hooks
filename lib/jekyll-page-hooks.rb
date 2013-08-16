@@ -1,3 +1,5 @@
+require 'jekyll'
+
 module Jekyll  
 
   # Extended plugin type that allows the plugin

@@ -13,7 +13,7 @@ Gem::Specification.new do |gem|
   gem.homepage      = "http://github.com/octopress/jekyll-page-hooks"
   gem.license       = "MIT"
 
-  gem.add_dependency 'jekyll', '>= 1.0.0'
+  gem.add_runtime_dependency 'jekyll', '>= 1.0.0'
 
   gem.files         = `git ls-files`.split($/)
   gem.require_paths = ["lib"]
