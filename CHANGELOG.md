@@ -10,3 +10,6 @@
 - Now requires Jekyll (oops)
 - Added tests
 
+### 1.1.0
+- Added Jekyll::ConvertiblePage type to hookable classes
+

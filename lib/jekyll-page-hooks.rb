@@ -37,11 +37,7 @@ module Jekyll
     # Instantiates all of the page_hook plugins. This is basically
     # a duplication of the other loaders in Site#setup.
     def load_page_hooks
-      self.page_hooks = Jekyll::PageHooks.subclasses.select do |c|
-        !self.safe || c.safe
-      end.map do |c|
-        c.new(self.config)
-      end
+      self.page_hooks = instantiate_subclasses(Jekyll::PageHooks)
     end
   end
 
@@ -95,8 +91,12 @@ module Jekyll
       self.class.to_s == 'Jekyll::Page'
     end
 
+    def is_convertible_page?
+      self.class.to_s == 'Jekyll::ConvertiblePage'
+    end
+
     def is_filterable?
-      is_post? or is_page?
+      is_post? or is_page? or is_convertible_page?
     end
 
     # Call the #pre_render methods on all of the loaded
