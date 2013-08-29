@@ -75,7 +75,7 @@ some external process.
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
-## Lisence
+## License
 
 Copyright (c) 2013 Brandon Mathis
 
