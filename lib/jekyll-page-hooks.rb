@@ -1,7 +1,7 @@
 require 'jekyll'
 
 module Jekyll  
-
+  
   # Extended plugin type that allows the plugin
   # to be called on varous callback methods.
   #
@@ -79,6 +79,26 @@ module Jekyll
     end
   end
 
+  # Create a new page class to allow partials to trigger Jekyll Page Hooks.
+  class ConvertiblePartial
+    include Convertible
+    
+    attr_accessor :name, :content, :site, :ext, :output, :data
+    
+    def initialize(site, name, content)
+      @site     = site
+      @name     = name
+      @ext      = File.extname(name)
+      @content  = content
+      @data     = { layout: "no_layout" } # hack
+      
+    end
+    
+    def render(payload)
+      do_layout(payload, { no_layout: nil })
+    end
+  end
+
   # Monkey patch for the Jekyll Convertible module. For the original class,
   # see: https://github.com/mojombo/jekyll/blob/master/lib/jekyll/convertible.rb
   module Convertible
@@ -92,12 +112,12 @@ module Jekyll
       self.class.to_s == 'Octopress::Ink::Page'
     end
 
-    def is_convertible_page?
-      self.class.to_s == 'Jekyll::ConvertiblePage'
+    def is_convertible_partial?
+      self.class.to_s == 'Jekyll::ConvertiblePartial'
     end
 
     def is_filterable?
-      is_post? or is_page? or is_convertible_page?
+      is_post? or is_page? or is_convertible_partial?
     end
 
     # Call the #pre_render methods on all of the loaded

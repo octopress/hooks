@@ -1,6 +1,9 @@
 # Changelog
 
 ### 1.2.0
+- Added support for processing partials as a ConvertiblePartial.
+
+### 1.2.0
 - Added support Jekyll 2.0
 
 ### 1.1.1
