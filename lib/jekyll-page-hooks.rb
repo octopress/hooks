@@ -104,7 +104,8 @@ module Jekyll
   module Convertible
 
     def is_post?
-      self.class.to_s == 'Jekyll::Post'
+      self.class.to_s == 'Jekyll::Post' ||
+      self.class.to_s == 'Jekyll::Draft'
     end
 
     def is_page?
