@@ -108,7 +108,8 @@ module Jekyll
     end
 
     def is_page?
-      self.is_a? Jekyll::Page
+      self.is_a? Jekyll::Page ||
+      self.class.to_s == 'Octopress::Ink::Page'
     end
 
     def is_convertible_partial?
