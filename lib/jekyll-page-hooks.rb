@@ -104,16 +104,16 @@ module Jekyll
   module Convertible
 
     def is_post?
-      self.class.to_s == 'Jekyll::Post'
+      self.is_a? Jekyll::Post
     end
 
     def is_page?
-      self.class.to_s == 'Jekyll::Page' ||
+      self.is_a? Jekyll::Page ||
       self.class.to_s == 'Octopress::Ink::Page'
     end
 
     def is_convertible_partial?
-      self.class.to_s == 'Jekyll::ConvertiblePartial'
+      self.is_a? Jekyll::ConvertiblePartial
     end
 
     def is_filterable?
