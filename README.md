@@ -6,7 +6,7 @@ This plugin isn't useful on its own. It monkeypatches Jekyll's Site, Post, Page 
 
 Add this line to your application's Gemfile:
 
-    gem 'jekyll-page-hooks'
+    gem 'octopress-hooks'
 
 And then execute:
 
@@ -14,7 +14,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install jekyll-page-hooks
+    $ gem install octopress-hooks
 
 ## Usage
 
