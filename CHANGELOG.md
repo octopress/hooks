@@ -1,6 +1,11 @@
 # Changelog
 
-### 1.2.0
+### 1.3.1
+- No longer requires Octopress Ink.
+- Renamed to octopress-hooks
+- moved to https://github.com/octopress/hooks
+
+### 1.3.0
 - Added support for processing partials as a ConvertiblePartial.
 
 ### 1.2.0

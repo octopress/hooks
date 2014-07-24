@@ -8,12 +8,18 @@ Gem::Specification.new do |gem|
   gem.version       = Jekyll::PageHooksVersion::VERSION
   gem.authors       = ["Brandon Mathis"]
   gem.email         = ["brandon@imathis.com"]
-  gem.description   = %q{Monkeypatches Jekyll's Site, Post, Page and Convertible classes to allow other plugins to access page/post content before and after render, and after write.}
+  gem.description   = %q{Renamed to octopress-hooks. - Monkeypatches Jekyll's Site, Post, Page and Convertible classes to allow other plugins to access page/post content before and after render, and after write.}
   gem.summary       = %q{Allows other plugins to access page/post content before and after render, and after write.}
   gem.homepage      = "http://github.com/octopress/jekyll-page-hooks"
   gem.license       = "MIT"
 
   gem.add_runtime_dependency 'jekyll', '>= 2.0.0'
+
+  gem.post_install_message = <<-MESSAGE
+!    The jekyll-page-hooks gem has been deprecated and has been replaced by octopress-hooks.
+!    See: https://rubygems.org/gems/octopress-hooks
+!    And: https://github.com/octopress/hooks
+MESSAGE
 
   gem.files         = `git ls-files`.split($/)
   gem.require_paths = ["lib"]
