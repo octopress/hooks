@@ -1,3 +1,3 @@
 ---
 ---
-This page hasn’t been written
+This page hasn't been written

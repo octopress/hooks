@@ -55,7 +55,7 @@ module TestingHooks
     end
 
     def log_write(content)
-      content.sub /hasn’t/, 'has'
+      content.sub /hasn't/, 'has'
     end
     
     # Replaces <strong> tag with <strong><blink> after html has been rendered.
