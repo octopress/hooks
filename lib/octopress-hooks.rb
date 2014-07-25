@@ -62,7 +62,7 @@ module Jekyll
 
   # For compatibilty with old jekyll-page-hooks gem
   #
-  class PageHooks < Octopress::Hooks::Page; end
+  PageHooks = Class.new(Octopress::Hooks::Page)
 
   # Monkey patch for the Jekyll Site class.
   class Site
@@ -149,7 +149,7 @@ module Jekyll
       @name     = name
       @ext      = File.extname(name)
       @content  = content
-      @data     = { layout: "no_layout" } # hack
+      @data     = { layout: nil } # hack
       
     end
     
@@ -252,7 +252,7 @@ module Jekyll
     # Returns the full url of the post, including the configured url
     #
     def full_url
-      self.site.config['url'] + self.url
+      File.join(self.site.config['url'], self.url)
     end
   end
 end
