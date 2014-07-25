@@ -1,4 +1,4 @@
-# Jekyll Page Hooks
+# Octopress Hooks
 
 This plugin isn't useful on its own. It monkeypatches Jekyll's Site, Post, Page and Convertible classes to allow plugin authors to access page and post data before and after render, and after write. 
 
@@ -6,7 +6,7 @@ This plugin isn't useful on its own. It monkeypatches Jekyll's Site, Post, Page 
 
 Add this line to your application's Gemfile:
 
-    gem 'jekyll-page-hooks'
+    gem 'octopress-hooks'
 
 And then execute:
 
@@ -14,7 +14,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install jekyll-page-hooks
+    $ gem install octopress-hooks
 
 ## Usage
 
@@ -23,37 +23,59 @@ First require this plugin at the top of a plugin file, inside of Jekyll's plugin
 Here's an example.
 
 ```ruby
-require 'jeykll-page-hooks'
+require 'octopress-hooks'
 
-module Jekyll
-  class YourFancyPlugin < PageHooks
+class YourPageHooks < Octopress::Hooks::Page
 
-    # Manipulate page/post data before it has been processed with Liquid or
-    # Converters like Markdown or Textile.
-    #
-    def pre_render(page)
-      page.content = highlight_code(page.content)
-    end
-
-    # Manipulate page/post data after content has been processed to html.
-    #
-    def post_render(page)
-      page.content = link_headings(page.content)
-    end
-
-    # Access page/post data after it has been succesfully written to disk.
-    #
-    def post_write(page)
-      log_something(page.title)
-    end
-
+  # Manipulate page/post data before it has been processed with Liquid or
+  # Converters like Markdown or Textile.
+  #
+  def pre_render(page)
+    page.content = highlight_code(page.content)
   end
+
+  # Manipulate page/post data after content has been processed to html.
+  #
+  def post_render(page)
+    page.content = link_headings(page.content)
+  end
+
+  # Access page/post data after it has been succesfully written to disk.
+  #
+  def post_write(page)
+    log_something(page.title)
+  end
+
+end
+
+class YourSiteHooks < Octopress::Hooks::Site
+
+  # Get access to the site before the render process
+  #
+  def pre_render(site)
+    # do something interesting
+  end
+
+  # Return a hash to be merged into the site payload
+  #
+  def merge_payload(payload, site)
+    { 'awesome' => true }
+  end
+
+  # Trigger some action after the site has been written 
+  #
+  def post_write(site)
+    # do something interesting
+  end
+
 end
 ```
 
-For a more complete example, check out [test.rb](test/_plugins/test.rb) and [index.md](test/index.md).
+For a more complete example, check out [test.rb](test/_plugins/test.rb).
 
 ### When to use what
+
+#### For posts/pages
 
 With `pre_render` you can access page and post data before it has been
 processed by Liquid, Markdown, Textile, etc. You might want to do this if your
@@ -67,36 +89,21 @@ With `post_write` you can execute a code block after a page or post has been
 successfully written to disk. You might use this for logging or triggering
 some external process.
 
+#### For site
+
+Use the `pre_render` hook to get access to the site class and modify it as necessary before posts and pages are rendered.
+You could use this to modify these objects or even add to them.
+
+Use the `merge_paylod` hook to add data that all documents will have access to when they are rendered, or modify the contents
+of the site payload. Be sure to return a hash that can be merged.
+
+Use the `post_write` to trigger and action after all documents have been written. With this you could gzip assets, or trigger a shell command.
+
 ## Contributing
 
-1. Fork it
+1. Fork it ( https://github.com/octopress/hooks/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
-
-## License
-
-Copyright (c) 2013 Brandon Mathis
-
-MIT License
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+5. Create a new Pull Request
 

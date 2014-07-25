@@ -1,5 +1,9 @@
 # Changelog
 
+### 2.0.0
+- Added support for Site hooks: pre_render, post_write and a way to patch the site payload.
+- Changed name to octopress-hooks and moved repository to octopress/hooks.
+
 ### 1.3.1
 - No longer requires Octopress Ink.
 - Renamed to octopress-hooks

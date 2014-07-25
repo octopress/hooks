@@ -1,8 +1,29 @@
-require 'jekyll-page-hooks'
-require 'time'
+require 'octopress-hooks'
 
-module Jekyll
-  class PageHooksTest < PageHooks
+module TestingHooks
+  class SiteHookTest < Octopress::Hooks::Site
+    def pre_render(site)
+      file = File.join(site.source, 'magic')
+      File.open(file, 'w') { |f| f.write('MAGIC') }
+      site.static_files << Jekyll::StaticFile.new(site, site.source, '', 'magic')
+    end
+
+    def merge_payload(payload, site)
+      if payload['site']['title']
+        payload['site']['name'] ||= payload['site']['title']
+      end
+
+      payload
+    end
+
+    def post_write(site)
+      file = File.join(site.config['destination'], 'boom')
+      File.open(file, 'w') { |f| f.write('BOOM') }
+      FileUtils.rm('magic')
+    end
+  end
+
+  class PageHooksTest < Jekyll::PageHooks
 
     # Inherited methods from PageHooks
    
@@ -21,7 +42,8 @@ module Jekyll
     # Called after write
     # 
     def post_write(page)
-      log_page page
+      file = page.destination(page.site.config['destination'])
+      File.open(file, 'w') { |f| f.write(log_write(page.content)) }
     end
 
     # Plugin methods
@@ -31,6 +53,10 @@ module Jekyll
     def snatch_cupcake(content)
       content.sub /\*cupcake\*/, '_______'
     end
+
+    def log_write(content)
+      content.sub /hasn&#39;t/, 'has'
+    end
     
     # Replaces <strong> tag with <strong><blink> after html has been rendered.
     #
@@ -39,19 +65,5 @@ module Jekyll
         "<blink>#{$1}</blink>"
       end
     end
-
-    # Rewrites the generated file on disk, replacing ::time:: with a <time> tag
-    # noting when the file was written.
-    #
-    def log_page(page)
-      time = Time.now
-      content = page.output.gsub /::time::/ do
-        "<time datetime='#{time.utc.iso8601}'>#{time.localtime.strftime('%Y-%m-%d %H:%M:%s')}</time>"
-      end
-      
-      file = page.destination page.site.config['destination']
-      File.open(file, 'w') { |f| f.write content }
-    end
-
   end
 end

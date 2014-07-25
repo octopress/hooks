@@ -1,4 +1,4 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in jekyll-pagehooks.gemspec
+# Specify your gem's dependencies in octopress-hooks.gemspec
 gemspec
