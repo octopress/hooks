@@ -23,7 +23,13 @@ module TestingHooks
     end
   end
 
-  class PageHooksTest < Jekyll::PageHooks
+  class PostHooksTest < Octopress::Hooks::Post
+    def post_init(post)
+      post.data['injected_data'] = 'awesome'
+    end
+  end
+
+  class PageHooksTest < Octopress::Hooks::Page
 
     # Inherited methods from PageHooks
    
