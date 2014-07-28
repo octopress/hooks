@@ -1,5 +1,11 @@
 # Changelog
 
+### 2.1.0
+- New: Added Post hooks.
+- Change: Page hooks now only target pages.
+- New: Added post_init hooks for pages and posts which is triggered after initialization.
+- Gone: Removed the ConvertiblePartial thing. It was unnecessary. Extending hooks is easy.
+
 ### 2.0.0
 - Added support for Site hooks: pre_render, post_write and a way to patch the site payload.
 - Changed name to octopress-hooks and moved repository to octopress/hooks.

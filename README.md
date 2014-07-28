@@ -2,6 +2,10 @@
 
 Modify Jekyll's Site, Pages and Posts at different points during the site processing stream.
 
+[![Build Status](https://travis-ci.org/octopress/hooks.svg)](https://travis-ci.org/octopress/hooks)
+[![Gem Version](http://img.shields.io/gem/v/octopress-hooks.svg)](https://rubygems.org/gems/octopress-hooks)
+[![License](http://img.shields.io/:license-mit-blue.svg)](http://octopress.mit-license.org)
+
 ## Installation
 
 Add this line to your application's Gemfile:
