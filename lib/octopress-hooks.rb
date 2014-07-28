@@ -3,11 +3,37 @@ require 'jekyll'
 
 module Octopress  
   module Hooks
+
+    class Site < Jekyll::Plugin
+
+      # Called before Jekyll renders posts and pages
+      # Returns nothing
+      # 
+      def pre_render(site)
+      end
+
+      # Merges hash into site_payload
+      # Returns hash to be merged
+      #
+      def merge_payload(payload, site)
+        payload
+      end
+
+      # Called after Jekyll writes site files
+      # Returns nothing
+      #
+      def post_write(site)
+      end
+    end
     
-    # Extended plugin type that allows the plugin
-    # to be called on varous callback methods.
-    #
     class Page < Jekyll::Plugin
+
+      # Called after Page is initialized
+      # allows you to modify a # page object before it is 
+      # added to the Jekyll pages array
+      #
+      def post_init(post)
+      end
 
       # Called before post is sent to the converter. Allows
       # you to modify the post object before the converter
@@ -31,28 +57,13 @@ module Octopress
       end
     end
 
-    class Site < Jekyll::Plugin
-
-      # Called before Jekyll renders posts and pages
-      # Returns nothing
-      # 
-      def pre_render(site)
-      end
-
-      # Merges hash into site_payload
-      # Returns hash to be merged
-      #
-      def merge_payload(payload, site)
-        payload
-      end
-
-      # Called after Jekyll writes site files
-      # Returns nothing
-      #
-      def post_write(site)
-      end
-
+    class Post < Jekyll::Plugin
+      def post_init(post); end
+      def pre_render(post); end
+      def post_render(post); end
+      def post_write(post); end
     end
+
   end
 end
 
@@ -69,27 +80,35 @@ module Jekyll
 
     # Instance variable to store the various page_hook
     # plugins that are loaded.
-    attr_accessor :page_hooks, :site_hooks
+    attr_accessor :page_hooks, :post_hooks, :site_hooks
 
     # Instantiates all of the hook plugins. This is basically
     # a duplication of the other loaders in Site#setup.
     def load_hooks
       self.site_hooks = instantiate_subclasses(Octopress::Hooks::Site)
       self.page_hooks = instantiate_subclasses(Octopress::Hooks::Page)
+      self.post_hooks = instantiate_subclasses(Octopress::Hooks::Post)
     end
 
 
     alias_method :old_site_payload, :site_payload
     alias_method :old_render, :render
     alias_method :old_write, :write
+    alias_method :old_read, :read
+
+    # Load hooks before read to ensure that Post and Page hooks 
+    # can be triggered during initialization
+    #
+    def read
+      self.load_hooks
+      old_read
+    end
 
     # Allows site hooks to get access to the site before
     # the render method is called
     #
     # Returns nothing
     def render
-      self.load_hooks
-
       if self.site_hooks
         self.site_hooks.each do |hook|
           hook.pre_render(self)
@@ -133,87 +152,41 @@ module Jekyll
         end
       end
     end
-
   end
 
 
-  # Create a new page class to allow partials to trigger Jekyll Page Hooks.
+  # Monkey patch Jekyll's Page class
   #
-  class ConvertiblePartial
-    include Convertible
-    
-    attr_accessor :name, :content, :site, :ext, :output, :data
-    
-    def initialize(site, name, content)
-      @site     = site
-      @name     = name
-      @ext      = File.extname(name)
-      @content  = content
-      @data     = { layout: nil } # hack
-      
+  class Page
+    alias_method :old_initialize, :initialize
+
+    def initialize(*args)
+      old_initialize(*args)
+      post_init if respond_to?(:post_init) && self.hooks
     end
-    
-    def render(payload)
-      do_layout(payload, { no_layout: nil })
+
+    def hooks
+      self.site.page_hooks
+    end
+  end
+
+  # Monkey patch Jekyll's Post class
+  #
+  class Post
+    alias_method :old_initialize, :initialize
+
+    def initialize(*args)
+      old_initialize(*args)
+      post_init if respond_to?(:post_init) && self.hooks
+    end
+
+    def hooks
+      self.site.post_hooks
     end
   end
 
   # Monkey patch for the Jekyll Convertible module.
   module Convertible
-
-    def is_post?
-      self.is_a? Jekyll::Post
-    end
-
-    def is_page?
-      self.is_a? Jekyll::Page ||
-      self.class.to_s == 'Octopress::Ink::Page'
-    end
-
-    def is_convertible_partial?
-      self.is_a? Jekyll::ConvertiblePartial
-    end
-
-    def is_filterable?
-      is_post? or is_page? or is_convertible_partial?
-    end
-
-    # Call the #pre_render methods on all of the loaded
-    # page_hook plugins.
-    #
-    # Returns nothing
-    def pre_render
-      if self.site.page_hooks and is_filterable?
-        self.site.page_hooks.each do |filter|
-          filter.pre_render(self)
-        end
-      end
-    end
-
-    # Call the #post_render methods on all of the loaded
-    # page_hook plugins.
-    #
-    # Returns nothing
-    def post_render
-      if self.site.page_hooks and is_filterable?
-        self.site.page_hooks.each do |filter|
-          filter.post_render(self)
-        end
-      end
-    end
-
-    # Call the #post_write methods on all of the loaded
-    # page_hook plugins.
-    #
-    # Returns nothing
-    def post_write
-      if self.site.page_hooks and is_filterable?
-        self.site.page_hooks.each do |filter|
-          filter.post_write(self)
-        end
-      end
-    end
-
     alias_method :old_transform, :transform
     alias_method :old_do_layout, :do_layout
     alias_method :old_write, :write
@@ -224,7 +197,7 @@ module Jekyll
     # Returns nothing.
     def transform
       old_transform
-      post_render if respond_to?(:post_render)
+      post_render if respond_to?(:post_render) && self.hooks
     end
 
     # Calls the pre_render method if it exists and then adds any necessary
@@ -235,7 +208,7 @@ module Jekyll
     #
     # Returns nothing.
     def do_layout(payload, layouts)
-      pre_render if respond_to?(:pre_render)
+      pre_render if respond_to?(:pre_render) && self.hooks
       old_do_layout(payload, layouts)
     end
 
@@ -246,7 +219,35 @@ module Jekyll
     # Returns nothing
     def write(dest)
       old_write(dest)
-      post_write if respond_to?(:post_write)
+      post_write if respond_to?(:post_write) && self.hooks
+    end
+
+    def hooks
+      []
+    end
+
+    def post_init
+      self.hooks.each do |hook|
+        hook.post_init(self)
+      end
+    end
+    
+    def pre_render
+      self.hooks.each do |hook|
+        hook.pre_render(self)
+      end
+    end
+
+    def post_render
+      self.hooks.each do |hook|
+        hook.post_render(self)
+      end
+    end
+
+    def post_write
+      self.hooks.each do |hook|
+        hook.post_write(self)
+      end
     end
 
     # Returns the full url of the post, including the configured url

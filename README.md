@@ -1,6 +1,6 @@
 # Octopress Hooks
 
-This plugin isn't useful on its own. It monkeypatches Jekyll's Site, Post, Page and Convertible classes to allow plugin authors to access page and post data before and after render, and after write. 
+Modify Jekyll's Site, Pages and Posts at different points during the site processing stream.
 
 ## Installation
 
@@ -18,86 +18,102 @@ Or install it yourself as:
 
 ## Usage
 
-First require this plugin at the top of a plugin file, inside of Jekyll's plugin directory. Then if your plugin class inherits the PageHooks class, the methods, `pre_render`, `post_render`, `post_write` will execute automatically in turn.
+First extend the appropriate Hook class.
 
-Here's an example.
+- `Octopress::Hooks::Site` - access Jekyll's Site instance.
+- `Octopress::Hooks::Page` - access to each of Jekyll's Page instances.
+- `Octopress::Hooks::Post` - access to each of Jekyll's Post instances.
 
-```ruby
-require 'octopress-hooks'
+Then add a method based on when you want to trigger your hooks.
 
-class YourPageHooks < Octopress::Hooks::Page
+#### Site Hooks
 
-  # Manipulate page/post data before it has been processed with Liquid or
-  # Converters like Markdown or Textile.
-  #
-  def pre_render(page)
-    page.content = highlight_code(page.content)
-  end
+The Site class has three methods. Here's an example.
 
-  # Manipulate page/post data after content has been processed to html.
-  #
-  def post_render(page)
-    page.content = link_headings(page.content)
-  end
-
-  # Access page/post data after it has been succesfully written to disk.
-  #
-  def post_write(page)
-    log_something(page.title)
-  end
-
-end
-
-class YourSiteHooks < Octopress::Hooks::Site
-
-  # Get access to the site before the render process
-  #
+```
+class MySiteHook < Octopress::Hooks::Site
+  
   def pre_render(site)
-    # do something interesting
   end
 
-  # Return a hash to be merged into the site payload
-  #
   def merge_payload(payload, site)
-    { 'awesome' => true }
   end
 
-  # Trigger some action after the site has been written 
-  #
   def post_write(site)
-    # do something interesting
   end
-
 end
 ```
 
-For a more complete example, check out [test.rb](test/_plugins/test.rb).
+Use the `pre_render` hook to modify the site instance before posts and pages are rendered.
 
-### When to use what
+Use the `merge_paylod` hook to modify the site payload or merge custom data into it. This data will be available to all documents when they are rendered. This method must return a hash.
 
-#### For posts/pages
+Use the `post_write` to trigger and action after all documents have been written to disk.
 
-With `pre_render` you can access page and post data before it has been
-processed by Liquid, Markdown, Textile, etc. You might want to do this if your
-plugin requires text which conflicts with some content convertors. This way
-you can replace that content with the correctly generated HTML before Liquid
-or other convertors sees it.
+#### Post/Page hooks
 
-With `post_render` you can access pages and posts after it has been proccessed into HTML. You might use this option if you want to modify generated HTML, for example adding anchors for each heading element.
+The Page and Post hooks have four methods and are identical except that Post hooks only operate on posts, and Page hooks only operate on
+pages. Here's an example of a Page hook.
 
-With `post_write` you can execute a code block after a page or post has been
-successfully written to disk. You might use this for logging or triggering
-some external process.
+```
+class MySiteHook < Octopress::Hooks::Page
 
-#### For site
+  def post_init(page)
+  end
+  
+  def pre_render(page)
+  end
 
-Use the `pre_render` hook to get access to the site class and modify it as necessary before posts and pages are rendered.
-You could use this to modify these objects or even add to them.
+  def post_render(page)
+  end
 
-Use the `merge_paylod` hook to add data that all documents will have access to when they are rendered, or modify the contents
-of the site payload. Be sure to return a hash that can be merged.
+  def post_write(page)
+  end
+end
+```
 
-Use the `post_write` to trigger and action after all documents have been written. With this you could gzip assets, or trigger a shell command.
+The `post_init` method lets you access the post or page class instance immediately after it has been initialized. This allows you to
+modify the instance before the Site compiles its payload, which includes arrays of each page and post.
+
+With `pre_render` you can parse and modify page contents before it is processed by Liquid, Markdown, Textile and the like, and rendered to HTML.
+
+With `post_render` you can access pages and posts after it has been converted into HTML. You might use this option if you want to modify generated HTML.
+
+With `post_write` you can execute a code block after a page or post has been successfully written to disk.
+
+To run an action on both posts and pages, you'd do something like this.
+
+```ruby
+module MyModule
+  def self.do_awesome(document)
+    # something awesome
+  end
+
+  MyPostHook < Octopress::Hooks::Post
+    def pre_render(post)
+      do_awesome(post)
+    end
+  end
+
+  MyPostHook < Octopress::Hooks::Page
+    def pre_render(post)
+      MyModule.do_awesome(post)
+    end
+  end
+end
+```
+
+### Hook timeline
+
+Just to be clear, this is the order in which these hooks are triggered.
+
+1. Post/Page `post_init`
+2. Site `pre_render`
+3. Site `merge_payload`
+4. Post/Page `pre_render`
+5. Post/Page `post_render`
+6. Post/Page `post_write`
+7. Site `post_write`
 
 ## Contributing
 
