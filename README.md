@@ -34,7 +34,7 @@ Then add a method based on when you want to trigger your hooks.
 
 The Site class has three methods. Here's an example.
 
-```
+```ruby
 class MySiteHook < Octopress::Hooks::Site
   
   def pre_render(site)
@@ -59,7 +59,7 @@ Use the `post_write` to trigger and action after all documents have been written
 The Page and Post hooks have four methods and are identical except that Post hooks only operate on posts, and Page hooks only operate on
 pages. Here's an example of a Page hook.
 
-```
+```ruby
 class MySiteHook < Octopress::Hooks::Page
 
   def post_init(page)
