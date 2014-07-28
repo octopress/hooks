@@ -3,10 +3,29 @@ require 'jekyll'
 
 module Octopress  
   module Hooks
+
+    class Site < Jekyll::Plugin
+
+      # Called before Jekyll renders posts and pages
+      # Returns nothing
+      # 
+      def pre_render(site)
+      end
+
+      # Merges hash into site_payload
+      # Returns hash to be merged
+      #
+      def merge_payload(payload, site)
+        payload
+      end
+
+      # Called after Jekyll writes site files
+      # Returns nothing
+      #
+      def post_write(site)
+      end
+    end
     
-    # Extended plugin type that allows the plugin
-    # to be called on varous callback methods.
-    #
     class Page < Jekyll::Plugin
 
       # Called after Page is initialized
@@ -45,33 +64,6 @@ module Octopress
       def post_write(post); end
     end
 
-    class Partial < Jekyll::Plugin
-      def pre_render(post); end
-      def post_render(post); end
-    end
-
-    class Site < Jekyll::Plugin
-
-      # Called before Jekyll renders posts and pages
-      # Returns nothing
-      # 
-      def pre_render(site)
-      end
-
-      # Merges hash into site_payload
-      # Returns hash to be merged
-      #
-      def merge_payload(payload, site)
-        payload
-      end
-
-      # Called after Jekyll writes site files
-      # Returns nothing
-      #
-      def post_write(site)
-      end
-
-    end
   end
 end
 
@@ -88,7 +80,7 @@ module Jekyll
 
     # Instance variable to store the various page_hook
     # plugins that are loaded.
-    attr_accessor :page_hooks, :post_hooks, :partial_hooks, :site_hooks
+    attr_accessor :page_hooks, :post_hooks, :site_hooks
 
     # Instantiates all of the hook plugins. This is basically
     # a duplication of the other loaders in Site#setup.
@@ -96,7 +88,6 @@ module Jekyll
       self.site_hooks = instantiate_subclasses(Octopress::Hooks::Site)
       self.page_hooks = instantiate_subclasses(Octopress::Hooks::Page)
       self.post_hooks = instantiate_subclasses(Octopress::Hooks::Post)
-      self.partial_hooks = instantiate_subclasses(Octopress::Hooks::Partial)
     end
 
 
@@ -163,45 +154,6 @@ module Jekyll
     end
   end
 
-
-  # Create a new page class to allow partials to trigger Jekyll Page Hooks.
-  #
-  class ConvertiblePartial
-    include Convertible
-    
-    attr_accessor :name, :content, :site, :ext, :output, :data
-    
-    def initialize(site, name, content)
-      @site     = site
-      @name     = name
-      @ext      = File.extname(name)
-      @content  = content
-      @data     = { layout: nil } # hack
-      
-    end
-    
-    def render(payload)
-      pre_render
-      do_layout(payload, { no_layout: nil })
-      post_render
-    end
-
-    def hooks
-      self.site.partial_hooks
-    end
-
-    def pre_render
-      self.hooks.each do |hook|
-        hook.pre_render(self)
-      end
-    end
-
-    def post_render
-      self.hooks.each do |hook|
-        hook.post_render(self)
-      end
-    end
-  end
 
   # Monkey patch Jekyll's Page class
   #
