@@ -1,2 +1,10 @@
-build: true
-compare: _expected _site
+-
+  build: true
+  before: rm pre_read post_read
+  compare: _expected/site _site
+-
+  name: Test post_read
+  enforce_missing: _site/post_read
+  compare: _expected/post_read post_read
+  after: rm pre_read post_read
+

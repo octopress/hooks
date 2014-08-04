@@ -6,6 +6,18 @@ module Octopress
 
     class Site < Jekyll::Plugin
 
+      # Called before after Jekyll reads in items
+      # Returns nothing
+      #
+      def pre_read(site)
+      end
+
+      # Called right after Jekyll reads in all items, but before generators
+      # Returns nothing
+      #
+      def post_read(site)
+      end
+
       # Called before Jekyll renders posts and pages
       # Returns nothing
       # 
@@ -101,7 +113,15 @@ module Jekyll
     #
     def read
       self.load_hooks
+      self.site_hooks.each do |hook|
+        hook.pre_read(self)
+      end
+
       old_read
+
+      self.site_hooks.each do |hook|
+        hook.post_read(self)
+      end
     end
 
     # Allows site hooks to get access to the site before

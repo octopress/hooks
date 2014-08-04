@@ -2,6 +2,16 @@ require 'octopress-hooks'
 
 module TestingHooks
   class SiteHookTest < Octopress::Hooks::Site
+    def pre_read(site)
+      file = File.join(site.source, 'pre_read')
+      File.open(file, 'w') { |f| f.write("pages: #{site.pages.size}") }
+    end
+
+    def post_read(site)
+      file = File.join(site.source, 'post_read')
+      File.open(file, 'w') { |f| f.write("pages: #{site.pages.size}") }
+    end
+
     def pre_render(site)
       file = File.join(site.source, 'magic')
       File.open(file, 'w') { |f| f.write('MAGIC') }

@@ -1,6 +1,10 @@
 # Changelog
 
-### 2.1.0
+### 2.2.0 - 2014-07-28
+- New: Site hook - pre_read, runs before site reads items
+- New: Site hook - post_read, runs after site reads items
+
+### 2.1.0 - 2014-07-28
 - New: Added Post hooks.
 - Change: Page hooks now only target pages.
 - New: Added post_init hooks for pages and posts which is triggered after initialization.
