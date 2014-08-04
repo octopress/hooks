@@ -37,6 +37,12 @@ The Site class has three methods. Here's an example.
 ```ruby
 class MySiteHook < Octopress::Hooks::Site
   
+  def pre_read(site)
+  end
+
+  def post_read(site)
+  end
+
   def pre_render(site)
   end
 
@@ -47,6 +53,10 @@ class MySiteHook < Octopress::Hooks::Site
   end
 end
 ```
+
+Use the `pre_read` hook to modify the site instance before posts, pages and static files are read.
+
+Use the `pre_read` hook to modify the site instance after posts, pages and static files are read but before generators are triggered.
 
 Use the `pre_render` hook to modify the site instance before posts and pages are rendered.
 
@@ -60,7 +70,7 @@ The Page and Post hooks have four methods and are identical except that Post hoo
 pages. Here's an example of a Page hook.
 
 ```ruby
-class MySiteHook < Octopress::Hooks::Page
+class MyPageHook < Octopress::Hooks::Page
 
   def post_init(page)
   end
@@ -99,9 +109,9 @@ module MyModule
     end
   end
 
-  MyPostHook < Octopress::Hooks::Page
-    def pre_render(post)
-      MyModule.do_awesome(post)
+  MyPageHook < Octopress::Hooks::Page
+    def pre_render(page)
+      MyModule.do_awesome(page)
     end
   end
 end
@@ -111,13 +121,16 @@ end
 
 Just to be clear, this is the order in which these hooks are triggered.
 
-1. Post/Page `post_init`
-2. Site `pre_render`
-3. Site `merge_payload`
-4. Post/Page `pre_render`
-5. Post/Page `post_render`
-6. Post/Page `post_write`
-7. Site `post_write`
+1. Site `pre_read`
+2. Site `post_read`
+3. Post/Page `post_init`
+4. Post/Page `post_init`
+5. Site `pre_render`
+6. Site `merge_payload`
+7. Post/Page `pre_render`
+8. Post/Page `post_render`
+9. Post/Page `post_write`
+10. Site `post_write`
 
 ## Contributing
 
