@@ -211,15 +211,6 @@ module Jekyll
     alias_method :old_do_layout, :do_layout
     alias_method :old_write, :write
 
-    # Transform the contents based on the content type. Then calls the
-    # #post_render method if it exists
-    #
-    # Returns nothing.
-    def transform
-      old_transform
-      post_render if respond_to?(:post_render) && self.hooks
-    end
-
     # Calls the pre_render method if it exists and then adds any necessary
     # layouts to this convertible document.
     #
@@ -230,6 +221,7 @@ module Jekyll
     def do_layout(payload, layouts)
       pre_render if respond_to?(:pre_render) && self.hooks
       old_do_layout(payload, layouts)
+      post_render if respond_to?(:post_render) && self.hooks
     end
 
     # Write the generated post file to the destination directory. It
