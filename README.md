@@ -56,7 +56,7 @@ end
 
 Use the `pre_read` hook to modify the site instance before posts, pages and static files are read.
 
-Use the `pre_read` hook to modify the site instance after posts, pages and static files are read but before generators are triggered.
+Use the `post_read` hook to modify the site instance after posts, pages and static files are read but before generators are triggered.
 
 Use the `pre_render` hook to modify the site instance before posts and pages are rendered.
 
@@ -91,7 +91,7 @@ modify the instance before the Site compiles its payload, which includes arrays 
 
 With `pre_render` you can parse and modify page contents before it is processed by Liquid, Markdown, Textile and the like, and rendered to HTML.
 
-With `post_render` you can access pages and posts after it has been converted into HTML. You might use this option if you want to modify generated HTML.
+With `post_render` you can access pages and posts after it has been converted into HTML. You might use this option if you want to modify generated HTML. At this stage, be sure to modify the `page.output` if you want change what the page displays.
 
 With `post_write` you can execute a code block after a page or post has been successfully written to disk.
 
