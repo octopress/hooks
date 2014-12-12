@@ -1,5 +1,9 @@
 # Changelog
 
+### 2.2.2 - 2014-10-12
+- Added support for octopress-docs
+- Minor bug fix for when there are no hooks
+
 ### 2.2.1 - 2014-08-13
 - Fix: Now compatible with Jekyll 2.3.0
 

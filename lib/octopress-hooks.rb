@@ -97,9 +97,9 @@ module Jekyll
     # Instantiates all of the hook plugins. This is basically
     # a duplication of the other loaders in Site#setup.
     def load_hooks
-      self.site_hooks = instantiate_subclasses(Octopress::Hooks::Site)
-      self.page_hooks = instantiate_subclasses(Octopress::Hooks::Page)
-      self.post_hooks = instantiate_subclasses(Octopress::Hooks::Post)
+      self.site_hooks = instantiate_subclasses(Octopress::Hooks::Site) || []
+      self.page_hooks = instantiate_subclasses(Octopress::Hooks::Page) || []
+      self.post_hooks = instantiate_subclasses(Octopress::Hooks::Post) || []
     end
 
 
@@ -270,3 +270,11 @@ module Jekyll
   end
 end
 
+if defined? Octopress::Docs
+  Octopress::Docs.add({
+    name:        "Octopress Hooks",
+    description: "Modify Jekyll's Site, Pages and Posts at different points during the site processing stream",
+    path:        File.expand_path(File.join(File.dirname(__FILE__), "../")),
+    source_url:  "https://github.com/octopress/hooks",
+  })
+end
