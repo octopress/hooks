@@ -1,5 +1,9 @@
 # Changelog
 
+### 2.2.3 - 2014-12-19
+
+- Readme updates
+
 ### 2.2.2 - 2014-10-12
 - Added support for octopress-docs
 - Minor bug fix for when there are no hooks

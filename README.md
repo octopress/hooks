@@ -124,13 +124,12 @@ Just to be clear, this is the order in which these hooks are triggered.
 1. Site `pre_read`
 2. Site `post_read`
 3. Post/Page `post_init`
-4. Post/Page `post_init`
-5. Site `pre_render`
-6. Site `merge_payload`
-7. Post/Page `pre_render`
-8. Post/Page `post_render`
-9. Post/Page `post_write`
-10. Site `post_write`
+4. Site `pre_render`
+5. Site `merge_payload`
+6. Post/Page `pre_render`
+7. Post/Page `post_render`
+8. Post/Page `post_write`
+9. Site `post_write`
 
 ## Contributing
 
