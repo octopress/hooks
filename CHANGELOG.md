@@ -1,7 +1,10 @@
 # Changelog
 
-### 2.2.3 - 2014-12-19
+### 2.3.0 - 2015-01-05
+- Added hooks to collection documents
+- Added New All hook which hooks posts, pages and collection pages.
 
+### 2.2.3 - 2014-12-19
 - Readme updates
 
 ### 2.2.2 - 2014-10-12

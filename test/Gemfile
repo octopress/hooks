@@ -1,6 +1,3 @@
 source 'https://rubygems.org'
 
-gem 'octopress-hooks', :path => '../'
-gem 'pry-debugger'
-gem 'clash'
-
+gemspec :path => '../'

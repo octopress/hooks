@@ -1,4 +1,4 @@
-require 'octopress-hooks'
+require File.expand_path('../../../lib/octopress-hooks.rb', __FILE__)
 
 module TestingHooks
   class SiteHookTest < Octopress::Hooks::Site
@@ -39,6 +39,42 @@ module TestingHooks
     end
   end
 
+  class DocHooksTest < Octopress::Hooks::Document
+
+    def post_init(doc)
+      doc.data['injected_data'] = 'Ok?'
+    end
+
+    # Called after processors
+    # 
+    def post_render(doc)
+      doc.output = blink_strong doc.output
+    end
+
+    def blink_strong(content)
+      content.gsub /(<strong>.+?<\/strong>)/ do
+        "<blink>#{$1}</blink>"
+      end
+    end
+  end
+
+  class AllHooksTest < Octopress::Hooks::All
+    def post_init(item)
+      item.data['hooked'] = 'yep'
+    end
+
+    def post_render(item)
+      item.output.gsub!('cookies', 'brownies')
+    end
+
+    def post_write(item)
+      file = Pathname.new(item.destination(item.site.config['destination']))
+      path = file.relative_path_from(Pathname.new(item.site.source))
+      File.open("_site/writelog", 'a') { |f| f.write("#{path}\n") }
+    end
+
+  end
+
   class PageHooksTest < Octopress::Hooks::Page
 
     # Inherited methods from PageHooks
@@ -49,10 +85,14 @@ module TestingHooks
       page.content = snatch_cupcake page.content
     end
 
+    def post_init(page)
+      page.data['injected_data'] = 'Ok?'
+    end
+
     # Called after processors
     # 
     def post_render(page)
-      page.content = blink_strong page.content
+      page.output = blink_strong page.output
     end
 
     # Called after write
@@ -77,7 +117,7 @@ module TestingHooks
     # Replaces <strong> tag with <strong><blink> after html has been rendered.
     #
     def blink_strong(content)
-      content.gsub /(<strong>.+?<\/strong>)/ do
+      content.gsub! /(<strong>.+?<\/strong>)/ do
         "<blink>#{$1}</blink>"
       end
     end

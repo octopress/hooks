@@ -44,28 +44,28 @@ module Octopress
       # allows you to modify a # page object before it is 
       # added to the Jekyll pages array
       #
-      def post_init(post)
+      def post_init(page)
       end
 
       # Called before post is sent to the converter. Allows
       # you to modify the post object before the converter
       # does it's thing
       #
-      def pre_render(post)
+      def pre_render(page)
       end
 
       # Called after the post is rendered with the converter.
       # Use the post object to modify it's contents before the
       # post is inserted into the template.
       #
-      def post_render(post)
+      def post_render(page)
       end
 
       # Called after the post is written to the disk.
       # Use the post object to read it's contents to do something
       # after the post is safely written.
       #
-      def post_write(post)
+      def post_write(page)
       end
     end
 
@@ -76,6 +76,19 @@ module Octopress
       def post_write(post); end
     end
 
+    class Document < Jekyll::Plugin
+      def post_init(doc); end
+      def pre_render(doc); end
+      def post_render(doc); end
+      def post_write(doc); end
+    end
+
+    class All < Jekyll::Plugin
+      def post_init(item); end
+      def pre_render(item); end
+      def post_render(item); end
+      def post_write(item); end
+    end
   end
 end
 
@@ -92,7 +105,7 @@ module Jekyll
 
     # Instance variable to store the various page_hook
     # plugins that are loaded.
-    attr_accessor :page_hooks, :post_hooks, :site_hooks
+    attr_accessor :page_hooks, :post_hooks, :site_hooks, :doc_hooks, :all_hooks
 
     # Instantiates all of the hook plugins. This is basically
     # a duplication of the other loaders in Site#setup.
@@ -100,6 +113,8 @@ module Jekyll
       self.site_hooks = instantiate_subclasses(Octopress::Hooks::Site) || []
       self.page_hooks = instantiate_subclasses(Octopress::Hooks::Page) || []
       self.post_hooks = instantiate_subclasses(Octopress::Hooks::Post) || []
+      self.doc_hooks  = instantiate_subclasses(Octopress::Hooks::Document) || []
+      self.all_hooks  = instantiate_subclasses(Octopress::Hooks::All) || []
     end
 
 
@@ -112,14 +127,15 @@ module Jekyll
     # can be triggered during initialization
     #
     def read
-      self.load_hooks
-      self.site_hooks.each do |hook|
+      load_hooks
+
+      site_hooks.each do |hook|
         hook.pre_read(self)
       end
 
       old_read
 
-      self.site_hooks.each do |hook|
+      site_hooks.each do |hook|
         hook.post_read(self)
       end
     end
@@ -129,10 +145,8 @@ module Jekyll
     #
     # Returns nothing
     def render
-      if self.site_hooks
-        self.site_hooks.each do |hook|
-          hook.pre_render(self)
-        end
+      site_hooks.each do |hook|
+        hook.pre_render(self)
       end
 
       old_render
@@ -145,12 +159,10 @@ module Jekyll
       unless @cached_payload
         payload = old_site_payload
 
-        if self.site_hooks
-          self.site_hooks.each do |hook|
-            p = hook.merge_payload(payload, self) || {}
-            if p != {}
-              payload = Jekyll::Utils.deep_merge_hashes(payload, p)
-            end
+        site_hooks.each do |hook|
+          p = hook.merge_payload(payload, self) || {}
+          if p != {}
+            payload = Jekyll::Utils.deep_merge_hashes(payload, p)
           end
         end
 
@@ -166,10 +178,8 @@ module Jekyll
     def write
       old_write
     
-      if self.site_hooks
-        self.site_hooks.each do |hook|
-          hook.post_write(self)
-        end
+      site_hooks.each do |hook|
+        hook.post_write(self)
       end
     end
   end
@@ -182,11 +192,67 @@ module Jekyll
 
     def initialize(*args)
       old_initialize(*args)
-      post_init if respond_to?(:post_init) && self.hooks
+      post_init if respond_to?(:post_init) && hooks
     end
 
     def hooks
-      self.site.page_hooks
+      @hooks ||= site.all_hooks + site.page_hooks
+    end
+  end
+
+  # Monkey patch Jekyll's Document class
+  #
+  class Document
+    alias_method :old_initialize, :initialize
+    alias_method :old_write, :write
+
+    def initialize(*args)
+      old_initialize(*args)
+      post_init if place_in_layout?
+    end
+
+    def write(dest)
+      post_render if place_in_layout?
+      old_write(dest)
+      post_write if place_in_layout?
+    end
+
+    def hooks
+      @hooks ||= site.all_hooks + site.doc_hooks
+    end
+
+    def post_init
+      hooks.each do |hook|
+        hook.post_init(self)
+      end
+    end
+
+    def pre_render
+      hooks.each do |hook|
+        hook.pre_render(self)
+      end
+    end
+
+    def post_render
+      hooks.each do |hook|
+        hook.post_render(self)
+      end
+    end
+
+    def post_write
+      hooks.each do |hook|
+        hook.post_write(self)
+      end
+    end
+  end
+
+  class Renderer
+    alias_method :old_run, :run
+    attr_accessor :output
+
+    def run
+      document.pre_render if document.place_in_layout?
+      old_run
     end
   end
 
@@ -197,11 +263,11 @@ module Jekyll
 
     def initialize(*args)
       old_initialize(*args)
-      post_init if respond_to?(:post_init) && self.hooks
+      post_init if respond_to?(:post_init) && hooks
     end
 
     def hooks
-      self.site.post_hooks
+      @hooks ||= site.all_hooks + site.post_hooks
     end
   end
 
@@ -219,9 +285,9 @@ module Jekyll
     #
     # Returns nothing.
     def do_layout(payload, layouts)
-      pre_render if respond_to?(:pre_render) && self.hooks
+      pre_render if respond_to?(:pre_render) && hooks
       old_do_layout(payload, layouts)
-      post_render if respond_to?(:post_render) && self.hooks
+      post_render if respond_to?(:post_render) && hooks
     end
 
     # Write the generated post file to the destination directory. It
@@ -231,7 +297,7 @@ module Jekyll
     # Returns nothing
     def write(dest)
       old_write(dest)
-      post_write if respond_to?(:post_write) && self.hooks
+      post_write if respond_to?(:post_write) && hooks
     end
 
     def hooks
@@ -239,25 +305,25 @@ module Jekyll
     end
 
     def post_init
-      self.hooks.each do |hook|
+      hooks.each do |hook|
         hook.post_init(self)
       end
     end
     
     def pre_render
-      self.hooks.each do |hook|
+      hooks.each do |hook|
         hook.pre_render(self)
       end
     end
 
     def post_render
-      self.hooks.each do |hook|
+      hooks.each do |hook|
         hook.post_render(self)
       end
     end
 
     def post_write
-      self.hooks.each do |hook|
+      hooks.each do |hook|
         hook.post_write(self)
       end
     end
@@ -265,7 +331,7 @@ module Jekyll
     # Returns the full url of the post, including the configured url
     #
     def full_url
-      File.join(self.site.config['url'], self.url)
+      File.join(site.config['url'], url)
     end
   end
 end

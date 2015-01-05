@@ -3,3 +3,8 @@ markdown: redcarpet
 highlighter: pygments
 exclude:
   - Gemfile*
+collections:
+  test_collection:
+    output: true
+gems:
+  - octopress-hooks

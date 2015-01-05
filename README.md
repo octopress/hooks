@@ -27,6 +27,7 @@ First extend the appropriate Hook class.
 - `Octopress::Hooks::Site` - access Jekyll's Site instance.
 - `Octopress::Hooks::Page` - access to each of Jekyll's Page instances.
 - `Octopress::Hooks::Post` - access to each of Jekyll's Post instances.
+- `Octopress::Hooks::Document` - access to each of Jekyll's Collection Documents instances.
 
 Then add a method based on when you want to trigger your hooks.
 
@@ -64,10 +65,9 @@ Use the `merge_paylod` hook to modify the site payload or merge custom data into
 
 Use the `post_write` to trigger and action after all documents have been written to disk.
 
-#### Post/Page hooks
+#### Post/Page/Documents hooks
 
-The Page and Post hooks have four methods and are identical except that Post hooks only operate on posts, and Page hooks only operate on
-pages. Here's an example of a Page hook.
+The Page, Post and Document hooks have four methods and are identical except that Post hooks only operate on posts, and Page hooks only operate on pages and Document hooks only Operate on Collection Documents. Here's an example of a Page hook.
 
 ```ruby
 class MyPageHook < Octopress::Hooks::Page
@@ -95,23 +95,37 @@ With `post_render` you can access pages and posts after it has been converted in
 
 With `post_write` you can execute a code block after a page or post has been successfully written to disk.
 
-To run an action on both posts and pages, you'd do something like this.
+To run an action all pages types, you'd do something like this.
 
 ```ruby
-module MyModule
-  def self.do_awesome(document)
-    # something awesome
+module Toaster
+  ProcessAll < Octopress::Hooks::All
+    def pre_render(item)
+      item.content.gsub!(/bread/, 'tost')
+    end
   end
+end
+```
 
-  MyPostHook < Octopress::Hooks::Post
+To process pages, posts, or documents individually, you'd do this.
+
+```ruby
+module Samurai
+  ProcessPosts < Octopress::Hooks::Post
     def pre_render(post)
-      do_awesome(post)
+      post.gsub!(/bread/, 'sliced bread')
     end
   end
 
-  MyPageHook < Octopress::Hooks::Page
+  ProcessPages < Octopress::Hooks::Page
     def pre_render(page)
-      MyModule.do_awesome(page)
+      post.gsub!(/bread/, 'sliced bread')
+    end
+  end
+
+  ProcessPages < Octopress::Hooks::Document
+    def pre_render(page)
+      post.gsub!(/bread/, 'sliced bread')
     end
   end
 end
@@ -123,12 +137,12 @@ Just to be clear, this is the order in which these hooks are triggered.
 
 1. Site `pre_read`
 2. Site `post_read`
-3. Post/Page `post_init`
+3. Post/Page/Document `post_init`
 4. Site `pre_render`
 5. Site `merge_payload`
-6. Post/Page `pre_render`
-7. Post/Page `post_render`
-8. Post/Page `post_write`
+6. Post/Page/Document `pre_render`
+7. Post/Page/Document `post_render`
+8. Post/Page/Document `post_write`
 9. Site `post_write`
 
 ## Contributing

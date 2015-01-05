@@ -8,7 +8,6 @@ Gem::Specification.new do |gem|
   gem.version       = Octopress::Hooks::VERSION
   gem.authors       = ["Brandon Mathis"]
   gem.email         = ["brandon@imathis.com"]
-  gem.description   = %q{Allows access to Jekyll's site, posts and pages at different points in the life cycle of a build. Formerly known as 'jekyll-page-hooks'.}
   gem.summary       = %q{Allows access to Jekyll's site, posts and pages at different points in the life cycle of a build. Formerly known as 'jekyll-page-hooks'.}
   gem.homepage      = "http://github.com/octopress/hooks"
   gem.license       = "MIT"
@@ -18,6 +17,10 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'clash', '~> 1.0'
   gem.add_development_dependency 'rake'
 
-  gem.files         = `git ls-files`.split($/)
+  if RUBY_VERSION >= "2"
+    gem.add_development_dependency "pry-byebug"
+  end
+  
+  gem.files         = `git ls-files`.split("\n").grep(%r{^(bin\/|lib\/|assets\/|local\/|changelog|readme|license)}i)
   gem.require_paths = ["lib"]
 end
