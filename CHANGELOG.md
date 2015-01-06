@@ -1,5 +1,8 @@
 # Changelog
 
+### 2.3.1 - 2015-01-05
+- Removed development logging (how embarrassing)
+
 ### 2.3.0 - 2015-01-05
 - Added hooks to collection documents
 - Added New All hook which hooks posts, pages and collection pages.
