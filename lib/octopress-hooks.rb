@@ -222,24 +222,28 @@ module Jekyll
     end
 
     def post_init
+      puts 'post_init doc'
       hooks.each do |hook|
         hook.post_init(self)
       end
     end
 
     def pre_render
+      puts 'pre_render doc'
       hooks.each do |hook|
         hook.pre_render(self)
       end
     end
 
     def post_render
+      puts 'post_render doc'
       hooks.each do |hook|
         hook.post_render(self)
       end
     end
 
     def post_write
+      puts 'post_write doc'
       hooks.each do |hook|
         hook.post_write(self)
       end

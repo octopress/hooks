@@ -95,7 +95,7 @@ With `post_render` you can access pages and posts after it has been converted in
 
 With `post_write` you can execute a code block after a page or post has been successfully written to disk.
 
-To run an action all pages types, you'd do something like this.
+To work with all page types, you'd do something like this.
 
 ```ruby
 module Toaster

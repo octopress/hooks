@@ -1,5 +1,4 @@
 title: Your New Jekyll Site
-markdown: redcarpet
 highlighter: pygments
 exclude:
   - Gemfile*
