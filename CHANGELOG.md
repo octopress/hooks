@@ -1,5 +1,8 @@
 # Changelog
 
+### 2.3.2 - 2015-01-07
+- Now hooks are registered after Jekyll Site resets.
+
 ### 2.3.1 - 2015-01-05
 - Removed development logging (how embarrassing)
 

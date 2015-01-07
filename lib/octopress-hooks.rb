@@ -117,7 +117,7 @@ module Jekyll
       self.all_hooks  = instantiate_subclasses(Octopress::Hooks::All) || []
     end
 
-
+    alias_method :old_reset, :reset
     alias_method :old_site_payload, :site_payload
     alias_method :old_render, :render
     alias_method :old_write, :write
@@ -126,9 +126,12 @@ module Jekyll
     # Load hooks before read to ensure that Post and Page hooks 
     # can be triggered during initialization
     #
-    def read
+    def reset
+      old_reset
       load_hooks
+    end
 
+    def read
       site_hooks.each do |hook|
         hook.pre_read(self)
       end
