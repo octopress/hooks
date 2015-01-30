@@ -63,6 +63,10 @@ module TestingHooks
       item.data['hooked'] = 'yep'
     end
 
+    def merge_payload(payload, page)
+      page.data['payload']
+    end
+
     def post_render(item)
       item.output.gsub!('cookies', 'brownies')
     end
@@ -88,6 +92,7 @@ module TestingHooks
     def post_init(page)
       page.data['injected_data'] = 'Ok?'
     end
+
 
     # Called after processors
     # 

@@ -1,5 +1,8 @@
 # Changelog
 
+### 2.4.0 - 2015-01-30
+- New: Pages, Posts, and Documents now have a `merge_payload` method which lets you modify the payload for each page before render.
+
 ### 2.3.2 - 2015-01-07
 - Now hooks are registered after Jekyll Site resets.
 

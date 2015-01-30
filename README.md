@@ -47,7 +47,10 @@ class MySiteHook < Octopress::Hooks::Site
   def pre_render(site)
   end
 
+  # Return a hash to merge into payload
+  #
   def merge_payload(payload, site)
+    {}
   end
 
   def post_write(site)
@@ -78,6 +81,12 @@ class MyPageHook < Octopress::Hooks::Page
   def pre_render(page)
   end
 
+  # Return a hash to merge into payload
+  #
+  def merge_payload(payload, page)
+    {}
+  end
+
   def post_render(page)
   end
 
@@ -91,6 +100,8 @@ modify the instance before the Site compiles its payload, which includes arrays 
 
 With `pre_render` you can parse and modify page contents before it is processed by Liquid, Markdown, Textile and the like, and rendered to HTML.
 
+Use the `merge_paylod` hook to modify the page and site payload or merge custom data into it. Changes to the payload will only affect this page when it is rendered. This method must return a hash to be merged.
+
 With `post_render` you can access pages and posts after it has been converted into HTML. You might use this option if you want to modify generated HTML. At this stage, be sure to modify the `page.output` if you want change what the page displays.
 
 With `post_write` you can execute a code block after a page or post has been successfully written to disk.
@@ -99,9 +110,9 @@ To work with all page types, you'd do something like this.
 
 ```ruby
 module Toaster
-  ProcessAll < Octopress::Hooks::All
+  class ProcessAll < Octopress::Hooks::All
     def pre_render(item)
-      item.content.gsub!(/bread/, 'tost')
+      item.content.gsub!(/bread/, 'toast')
     end
   end
 end
@@ -111,19 +122,19 @@ To process pages, posts, or documents individually, you'd do this.
 
 ```ruby
 module Samurai
-  ProcessPosts < Octopress::Hooks::Post
+  class ProcessPosts < Octopress::Hooks::Post
     def pre_render(post)
       post.gsub!(/bread/, 'sliced bread')
     end
   end
 
-  ProcessPages < Octopress::Hooks::Page
+  class ProcessPages < Octopress::Hooks::Page
     def pre_render(page)
       post.gsub!(/bread/, 'sliced bread')
     end
   end
 
-  ProcessPages < Octopress::Hooks::Document
+  class ProcessPages < Octopress::Hooks::Document
     def pre_render(page)
       post.gsub!(/bread/, 'sliced bread')
     end
@@ -141,6 +152,7 @@ Just to be clear, this is the order in which these hooks are triggered.
 4. Site `pre_render`
 5. Site `merge_payload`
 6. Post/Page/Document `pre_render`
+5. Post/Page/Document `merge_payload`
 7. Post/Page/Document `post_render`
 8. Post/Page/Document `post_write`
 9. Site `post_write`

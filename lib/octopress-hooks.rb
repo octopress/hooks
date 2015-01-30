@@ -54,6 +54,15 @@ module Octopress
       def pre_render(page)
       end
 
+      # Called right after pre_render hook. Allows you to
+      # act on the page's payload data. 
+      #
+      # Return: hash to be deep_merged into payload
+      #
+      def merge_payload(payload, page)
+        payload
+      end
+
       # Called after the post is rendered with the converter.
       # Use the post object to modify it's contents before the
       # post is inserted into the template.
@@ -71,6 +80,7 @@ module Octopress
 
     class Post < Jekyll::Plugin
       def post_init(post); end
+      def merge_payload(payload, post); payload; end
       def pre_render(post); end
       def post_render(post); end
       def post_write(post); end
@@ -78,6 +88,7 @@ module Octopress
 
     class Document < Jekyll::Plugin
       def post_init(doc); end
+      def merge_payload(payload, doc); payload; end
       def pre_render(doc); end
       def post_render(doc); end
       def post_write(doc); end
@@ -85,6 +96,7 @@ module Octopress
 
     class All < Jekyll::Plugin
       def post_init(item); end
+      def merge_payload(payload, item); payload; end
       def pre_render(item); end
       def post_render(item); end
       def post_write(item); end
@@ -159,7 +171,7 @@ module Jekyll
     #
     # Returns the patched site payload
     def site_payload
-      unless @cached_payload
+      @cached_payload = begin
         payload = old_site_payload
 
         site_hooks.each do |hook|
@@ -168,11 +180,8 @@ module Jekyll
             payload = Jekyll::Utils.deep_merge_hashes(payload, p)
           end
         end
-
-        @cached_payload = payload
+        payload
       end
-
-      @cached_payload
     end
 
     # Trigger site hooks after site has been written
@@ -236,6 +245,16 @@ module Jekyll
       end
     end
 
+    def merge_payload(payload)
+      hooks.each do |hook|
+        p = hook.merge_payload(payload, self)
+        if p && p.is_a?(Hash)
+          payload = Jekyll::Utils.deep_merge_hashes(payload, p)
+        end
+      end
+      payload
+    end
+
     def post_render
       hooks.each do |hook|
         hook.post_render(self)
@@ -250,12 +269,17 @@ module Jekyll
   end
 
   class Renderer
-    alias_method :old_run, :run
+    alias_method :old_render_liquid, :render_liquid
     attr_accessor :output
 
-    def run
-      document.pre_render if document.place_in_layout?
-      old_run
+    def render_liquid(content, payload, info, path = nil)
+      document.pre_render if document.respond_to?(:pre_render) && document.hooks
+
+      if document.respond_to?(:merge_payload) && document.hooks
+        old_render_liquid(document.content, document.merge_payload(payload.dup), info)
+      else
+        old_render_liquid(document.content, payload, info)
+      end
     end
   end
 
@@ -289,7 +313,13 @@ module Jekyll
     # Returns nothing.
     def do_layout(payload, layouts)
       pre_render if respond_to?(:pre_render) && hooks
-      old_do_layout(payload, layouts)
+
+      if respond_to?(:merge_payload) && hooks
+        old_do_layout(merge_payload(payload.dup), layouts)
+      else
+        old_do_layout(payload, layouts)
+      end
+
       post_render if respond_to?(:post_render) && hooks
     end
 
@@ -313,6 +343,16 @@ module Jekyll
       end
     end
     
+    def merge_payload(payload)
+      hooks.each do |hook|
+        p = hook.merge_payload(payload, self)
+        if p && p.is_a?(Hash)
+          payload = Jekyll::Utils.deep_merge_hashes(payload, p)
+        end
+      end
+      payload
+    end
+
     def pre_render
       hooks.each do |hook|
         hook.pre_render(self)

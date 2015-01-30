@@ -4,4 +4,5 @@ _site/merge_payload.html
 _site/post_render_page.html
 _site/post_write_page.html
 _site/pre_render_page.html
+_site/test_merge_payload.html
 _site/test_collection/file.html
