@@ -1,5 +1,8 @@
 # Changelog
 
+### 2.4.1 - 2015-01-30
+- Fix: Collection rendering issues for no-output collection items.
+
 ### 2.4.0 - 2015-01-30
 - New: Pages, Posts, and Documents now have a `merge_payload` method which lets you modify the payload for each page before render.
 

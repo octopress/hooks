@@ -270,15 +270,19 @@ module Jekyll
 
   class Renderer
     alias_method :old_render_liquid, :render_liquid
+    alias_method :old_run, :run
     attr_accessor :output
 
-    def render_liquid(content, payload, info, path = nil)
+    def run
       document.pre_render if document.respond_to?(:pre_render) && document.hooks
+      old_run
+    end
 
+    def render_liquid(content, payload, info, path = nil)
       if document.respond_to?(:merge_payload) && document.hooks
-        old_render_liquid(document.content, document.merge_payload(payload.dup), info)
+        old_render_liquid(content, document.merge_payload(payload.dup), info)
       else
-        old_render_liquid(document.content, payload, info)
+        old_render_liquid(content, payload, info)
       end
     end
   end
