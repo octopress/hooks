@@ -20,6 +20,21 @@ Or install it yourself as:
 
     $ gem install octopress-hooks
 
+## Hook timeline
+
+This is the order in which hooks are triggered.
+
+1. Site `pre_read`
+2. Site `post_read`
+3. Post/Page/Document `post_init`
+4. Site `pre_render`
+5. Site `merge_payload`
+6. Post/Page/Document `pre_render`
+5. Post/Page/Document `merge_payload`
+7. Post/Page/Document `post_render`
+8. Post/Page/Document `post_write`
+9. Site `post_write`
+
 ## Usage
 
 First extend the appropriate Hook class.
@@ -141,21 +156,6 @@ module Samurai
   end
 end
 ```
-
-### Hook timeline
-
-Just to be clear, this is the order in which these hooks are triggered.
-
-1. Site `pre_read`
-2. Site `post_read`
-3. Post/Page/Document `post_init`
-4. Site `pre_render`
-5. Site `merge_payload`
-6. Post/Page/Document `pre_render`
-5. Post/Page/Document `merge_payload`
-7. Post/Page/Document `post_render`
-8. Post/Page/Document `post_write`
-9. Site `post_write`
 
 ## Contributing
 
