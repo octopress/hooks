@@ -1,5 +1,8 @@
 # Changelog
 
+### 2.5.0 - 2015-02-16
+- New: `deep_merge_payload` hook allows Posts, Pages, and Documents to have control over the way the payload is merged. (Expert level) 
+
 ### 2.4.1 - 2015-01-30
 - Fix: Collection rendering issues for no-output collection items.
 
