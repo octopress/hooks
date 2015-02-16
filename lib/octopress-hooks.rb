@@ -63,6 +63,17 @@ module Octopress
         payload
       end
 
+      # Merges payload with original page payload
+      # Allowing merged_payload to return hash fragments, for example:
+      # merge_payload can return { awesome => true } and it will be merged
+      # into the full payload.
+      #
+      # Retuns: a payload that has been deep merged with the original page's payload
+      #
+      def deep_merge_payload(page_payload, hook_payload)
+        Jekyll::Utils.deep_merge_hashes(page_payload, hook_payload)
+      end
+
       # Called after the post is rendered with the converter.
       # Use the post object to modify it's contents before the
       # post is inserted into the template.
@@ -81,6 +92,9 @@ module Octopress
     class Post < Jekyll::Plugin
       def post_init(post); end
       def merge_payload(payload, post); payload; end
+      def deep_merge_payload(page_payload, hook_payload)
+        Jekyll::Utils.deep_merge_hashes(page_payload, hook_payload)
+      end
       def pre_render(post); end
       def post_render(post); end
       def post_write(post); end
@@ -89,6 +103,9 @@ module Octopress
     class Document < Jekyll::Plugin
       def post_init(doc); end
       def merge_payload(payload, doc); payload; end
+      def deep_merge_payload(page_payload, hook_payload)
+        Jekyll::Utils.deep_merge_hashes(page_payload, hook_payload)
+      end
       def pre_render(doc); end
       def post_render(doc); end
       def post_write(doc); end
@@ -97,6 +114,9 @@ module Octopress
     class All < Jekyll::Plugin
       def post_init(item); end
       def merge_payload(payload, item); payload; end
+      def deep_merge_payload(page_payload, hook_payload)
+        Jekyll::Utils.deep_merge_hashes(page_payload, hook_payload)
+      end
       def pre_render(item); end
       def post_render(item); end
       def post_write(item); end
@@ -175,10 +195,9 @@ module Jekyll
         payload = old_site_payload
 
         site_hooks.each do |hook|
-          p = hook.merge_payload(payload, self) || {}
-          if p != {}
-            payload = Jekyll::Utils.deep_merge_hashes(payload, p)
-          end
+          p = hook.merge_payload(payload, self)
+          next unless p && p.is_a?(Hash)
+          payload = Jekyll::Utils.deep_merge_hashes(payload, p)
         end
         payload
       end
@@ -248,9 +267,8 @@ module Jekyll
     def merge_payload(payload)
       hooks.each do |hook|
         p = hook.merge_payload(payload, self)
-        if p && p.is_a?(Hash)
-          payload = Jekyll::Utils.deep_merge_hashes(payload, p)
-        end
+        next unless p && p.is_a?(Hash)
+        payload = hook.deep_merge_payload(payload, p)
       end
       payload
     end
@@ -350,9 +368,8 @@ module Jekyll
     def merge_payload(payload)
       hooks.each do |hook|
         p = hook.merge_payload(payload, self)
-        if p && p.is_a?(Hash)
-          payload = Jekyll::Utils.deep_merge_hashes(payload, p)
-        end
+        next unless p && p.is_a?(Hash)
+        payload = hook.deep_merge_payload(payload, p)
       end
       payload
     end
