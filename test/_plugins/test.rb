@@ -1,17 +1,17 @@
 require File.expand_path('../../../lib/octopress-hooks.rb', __FILE__)
 
-@whatever = true
+@kill_reset = true
 
 module TestingHooks
   class SiteHookTest < Octopress::Hooks::Site
     def pre_read(site)
       file = File.join(site.source, 'pre_read')
       File.open(file, 'w') { |f| f.write("pages: #{site.pages.size}") }
-      abort 'Reset failed' if @wahtever
+      abort 'Reset failed' if @kill_reset
     end
 
     def reset(site)
-      @wahtever = false
+      @kill_reset = false
     end
 
     def post_read(site)
