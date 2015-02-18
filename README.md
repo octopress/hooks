@@ -24,16 +24,17 @@ Or install it yourself as:
 
 This is the order in which hooks are triggered.
 
-1. Site `pre_read`
-2. Site `post_read`
-3. Post/Page/Document `post_init`
-4. Site `pre_render`
-5. Site `merge_payload`
-6. Post/Page/Document `pre_render`
-5. Post/Page/Document `merge_payload`
-7. Post/Page/Document `post_render`
-8. Post/Page/Document `post_write`
-9. Site `post_write`
+1. Site `reset`
+2. Site `pre_read`
+3. Site `post_read`
+4. Post/Page/Document `post_init`
+5. Site `pre_render`
+6. Site `merge_payload`
+5. Post/Page/Document `pre_render`
+7. Post/Page/Document `merge_payload`
+8. Post/Page/Document `post_render`
+9. Post/Page/Document `post_write`
+10. Site `post_write`
 
 ## Usage
 
@@ -52,6 +53,8 @@ The Site class has three methods. Here's an example.
 
 ```ruby
 class MySiteHook < Octopress::Hooks::Site
+  def reset(site)
+  end
   
   def pre_read(site)
   end
@@ -72,6 +75,8 @@ class MySiteHook < Octopress::Hooks::Site
   end
 end
 ```
+
+Use the `reset` hook to reset variables to before each build. It's mostly useful to support `--watch` builds.
 
 Use the `pre_read` hook to modify the site instance before posts, pages and static files are read.
 
