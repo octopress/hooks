@@ -6,6 +6,12 @@ module Octopress
 
     class Site < Jekyll::Plugin
 
+      # Called at the beginning of every build
+      # Returns nothing
+      #
+      def reset(site)
+      end
+
       # Called before after Jekyll reads in items
       # Returns nothing
       #
@@ -36,6 +42,7 @@ module Octopress
       #
       def post_write(site)
       end
+
     end
     
     class Page < Jekyll::Plugin
@@ -161,6 +168,9 @@ module Jekyll
     def reset
       old_reset
       load_hooks
+      site_hooks.each do |hook|
+        hook.reset(self)
+      end
     end
 
     def read
