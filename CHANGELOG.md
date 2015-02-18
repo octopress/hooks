@@ -1,5 +1,8 @@
 # Changelog
 
+### 2.6.0 - 2015-02-16
+- New: Site `reset` hook helps you reset variables before successive builds.
+
 ### 2.5.0 - 2015-02-16
 - New: `deep_merge_payload` hook allows Posts, Pages, and Documents to have control over the way the payload is merged. (Expert level) 
 
