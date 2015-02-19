@@ -84,7 +84,7 @@ Use the `post_read` hook to modify the site instance after posts, pages and stat
 
 Use the `pre_render` hook to modify the site instance before posts and pages are rendered.
 
-Use the `merge_paylod` hook to modify the site payload or merge custom data into it. This data will be available to all documents when they are rendered. This method must return a hash.
+Use the `merge_payload` hook to modify the site payload or merge custom data into it. This data will be available to all documents when they are rendered. This method must return a hash.
 
 Use the `post_write` to trigger and action after all documents have been written to disk.
 
@@ -115,8 +115,7 @@ class MyPageHook < Octopress::Hooks::Page
 end
 ```
 
-The `post_init` method lets you access the post or page class instance immediately after it has been initialized. This allows you to
-modify the instance before the Site compiles its payload, which includes arrays of each page and post.
+The `post_init` method lets you access the post or page class instance immediately after it has been initialized. This allows you to modify the instance before the Site compiles its payload, which includes arrays of each page and post.
 
 With `pre_render` you can parse and modify page contents before it is processed by Liquid, Markdown, Textile and the like, and rendered to HTML.
 
