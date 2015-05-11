@@ -12,9 +12,9 @@ Gem::Specification.new do |gem|
   gem.homepage      = "http://github.com/octopress/hooks"
   gem.license       = "MIT"
 
-  gem.add_runtime_dependency 'jekyll', '~> 2.0'
+  gem.add_runtime_dependency 'jekyll', '>= 2.0'
 
-  gem.add_development_dependency 'clash', '~> 1.0'
+  gem.add_development_dependency 'clash'
   gem.add_development_dependency 'rake'
 
   if RUBY_VERSION >= "2"
