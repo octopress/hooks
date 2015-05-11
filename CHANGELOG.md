@@ -1,5 +1,8 @@
 # Changelog
 
+### 2.6.1 - 2015-05-11
+- Minor: Loosened Gemspec dependency version to allow Jekyll 3.0
+
 ### 2.6.0 - 2015-02-16
 - New: Site `reset` hook helps you reset variables before successive builds.
 
