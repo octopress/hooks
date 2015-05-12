@@ -18,7 +18,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rake'
 
   if RUBY_VERSION >= "2"
-    gem.add_development_dependency "pry-byebug"
+    gem.add_development_dependency "octopress-debugger"
   end
   
   gem.files         = `git ls-files`.split("\n").grep(%r{^(bin\/|lib\/|assets\/|local\/|changelog|readme|license)}i)
