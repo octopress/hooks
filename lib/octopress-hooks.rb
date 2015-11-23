@@ -1,7 +1,7 @@
 require 'octopress-hooks/version'
 require 'jekyll'
 
-module Octopress  
+module Octopress
   module Hooks
 
     class Site < Jekyll::Plugin
@@ -26,7 +26,7 @@ module Octopress
 
       # Called before Jekyll renders posts and pages
       # Returns nothing
-      # 
+      #
       def pre_render(site)
       end
 
@@ -44,11 +44,11 @@ module Octopress
       end
 
     end
-    
+
     class Page < Jekyll::Plugin
 
       # Called after Page is initialized
-      # allows you to modify a # page object before it is 
+      # allows you to modify a # page object before it is
       # added to the Jekyll pages array
       #
       def post_init(page)
@@ -62,7 +62,7 @@ module Octopress
       end
 
       # Called right after pre_render hook. Allows you to
-      # act on the page's payload data. 
+      # act on the page's payload data.
       #
       # Return: hash to be deep_merged into payload
       #
@@ -162,7 +162,7 @@ module Jekyll
     alias_method :old_write, :write
     alias_method :old_read, :read
 
-    # Load hooks before read to ensure that Post and Page hooks 
+    # Load hooks before read to ensure that Post and Page hooks
     # can be triggered during initialization
     #
     def reset
@@ -218,7 +218,7 @@ module Jekyll
     # Returns nothing
     def write
       old_write
-    
+
       site_hooks.each do |hook|
         hook.post_write(self)
       end
@@ -308,9 +308,9 @@ module Jekyll
 
     def render_liquid(content, payload, info, path = nil)
       if document.respond_to?(:merge_payload) && document.hooks
-        old_render_liquid(content, document.merge_payload(payload.dup), info)
+        old_render_liquid(content, document.merge_payload(payload.dup), info, path)
       else
-        old_render_liquid(content, payload, info)
+        old_render_liquid(content, payload, info, path)
       end
     end
   end
@@ -374,7 +374,7 @@ module Jekyll
         hook.post_init(self)
       end
     end
-    
+
     def merge_payload(payload)
       hooks.each do |hook|
         p = hook.merge_payload(payload, self)
