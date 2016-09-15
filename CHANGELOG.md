@@ -1,5 +1,8 @@
 # Changelog
 
+### 2.6.2 - 2016-09-15
+- Bug: Properly pass the path to the Liquid render function.
+
 ### 2.6.1 - 2015-05-11
 - Minor: Loosened Gemspec dependency version to allow Jekyll 3.0
 
@@ -7,7 +10,7 @@
 - New: Site `reset` hook helps you reset variables before successive builds.
 
 ### 2.5.0 - 2015-02-16
-- New: `deep_merge_payload` hook allows Posts, Pages, and Documents to have control over the way the payload is merged. (Expert level) 
+- New: `deep_merge_payload` hook allows Posts, Pages, and Documents to have control over the way the payload is merged. (Expert level)
 
 ### 2.4.1 - 2015-01-30
 - Fix: Collection rendering issues for no-output collection items.
